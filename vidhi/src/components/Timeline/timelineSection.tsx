@@ -7,65 +7,49 @@ import type { Era } from "./data/eras";
 interface EraItemProps{
     era: Era;
     index:number;
-
 }
 
-    function EraItem({era,index}:EraItemProps){
-        const isEven = index%2===0;
-        return(
-         <>
-         
+function EraItem({era,index}:EraItemProps){
+    const isEven = index%2===0;
+    return(
+        <>
+            {/*parent of grid div allowing us to position grid correctly*/}
+            <div className={`mb-8 sm:mb-12 md:mb-16 lg:mb-20 xl:mb-[100px] mt-8 sm:mt-12 md:mt-16 lg:mt-20 xl:mt-[100px] flex flex-col 2xl:flex-row ${isEven ? "2xl:justify-end" : "2xl:justify-start"} items-center 2xl:items-start`}>
 
-      
-                  {/*parent of grid div allowing us to position grid correctly*/}
-              <div className={`mb-[100px] mt-[100px] flex ${isEven?"justify-end":"justify-start"}`}>
-      
-                    {/*Title div for each grid*/}
-                 <div className={`text-4xl text-white drop-shadow-lg font-bold absolute mt-10 ${isEven?"right-[450px]":"left-[450px]"}`}>{era.title}</div>
-      
-                  {/*grid div for positioning */}
-              <div  className="w-[60%] my-[100px]   bg-[#FFCEEF] grid grid-cols-3 gap-10 p-10 border-transparent rounded-3xl">
+                {/*Title div for each grid - responsive positioning*/}
+                <div className={`text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl 2xl:text-4xl text-white drop-shadow-lg font-bold mb-4 2xl:mb-0 text-center 2xl:text-left 2xl:absolute 2xl:mt-10 ${isEven ? "2xl:right-[540px] 3xl:right-[590px]" : "2xl:left-[540px] 3xl:left-[590px]"}`}>
+                    {era.title}
+                </div>
+
+                {/*grid div for positioning - responsive width and grid*/}
+                <div className="w-full sm:w-[90%] md:w-[85%] lg:w-[75%] xl:w-[60%] 2xl:w-[60%] 3xl:w-[75%] my-4 sm:my-6 md:my-8 lg:my-12 xl:my-16 2xl:my-[100px] bg-[#FFCEEF] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6 lg:gap-8 xl:gap-10 2xl:gap-10 3xl:gap-20 p-3 sm:p-4 md:p-6 lg:p-8 xl:p-8 2xl:p-8 3xl:p-8 border-transparent rounded-2xl sm:rounded-3xl">
                  
-                 {/*grid elements */}
-                 {era.images.map((img, i) => (
-  <div key={`${era.id}-${i}`} className="relative aspect-square group overflow-hidden rounded-xl">
-    <Image src={`/api/i/${era.base}${img.name}`} 
-    alt={img.alt} 
-    fill
-    sizes="(min-width:1024px) 200px, (min-width:640px) 33vw, 50vw"
-    className="object-fill transition-transform duration-500 group-hover:scale-110"
-    priority={index < 4} // optional: eager-load top items
-    />
-  </div>
-))}
-
-
-  
-              </div>
-              </div>
-              
-             
-             
-              
-      
-              </>
-              
-             
-      
-              
-          )
-    }
+                    {/*grid elements */}
+                    {era.images.map((img, i) => (
+                        <div key={`${era.id}-${i}`} className="relative aspect-square group overflow-hidden rounded-lg sm:rounded-xl">
+                            <Image 
+                                src={`/api/i/${era.base}${img.name}`} 
+                                alt={img.alt} 
+                                fill
+                                sizes="(min-width: 1536px) 400px, (min-width: 1280px) 300px, (min-width: 1024px) 200px, (min-width: 640px) 33vw, (min-width: 480px) 50vw, 100vw"
+                                className="object-cover transition-transform duration-500 group-hover:scale-110"
+                                priority={index < 2} // Load first 2 eras eagerly
+                            />
+                        </div>
+                    ))}
+                </div>
+            </div>
+        </>
+    )
+}
 
 export default function TimelineSection(){
-
-return(
-       // main container 
-       <div className="border-transparent rounded-3xl ">
-                  {eras.map((era, index) => (
-        <EraItem key={index} era={era} index={index} />
-      ))}
-               </div>
-)
-
-  
+    return(
+        // main container with responsive padding
+        <div className="border-transparent rounded-2xl sm:rounded-3xl px-2 sm:px-4 md:px-6 lg:px-8">
+            {eras.map((era, index) => (
+                <EraItem key={index} era={era} index={index} />
+            ))}
+        </div>
+    )
 }
