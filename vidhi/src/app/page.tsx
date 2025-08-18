@@ -3,10 +3,10 @@ import TimelineSection from "../components/Timeline/timelineSection"
 
 export default function Page(){
   return(
-      <div className="min-h-screen bg-[#F2CEE6] py-10">
+      <div className="min-h-screen bg-[#F2CEE6] p-6 md:p-8 lg:p-10 ">
 
         {/* container */}
-          <main className="w-[95%] bg-[#812261] mt-2 mb-2 mx-auto overflow-hidden border-transparent rounded-3xl p-10">
+          <main className="w-full max-w-7xl mx-auto bg-[#812261] overflow-hidden rounded-3xl shadow px-4 sm:px-6 md:px-10 py-6 sm:py-8 md:py-10">
 
 {/*seperate div for each section with consistent styling for each div and the inner section of each div*/}
               <div className="bg-[#D86DB5] border-transparent rounded-3xl p-10 mb-4 mt-4">
