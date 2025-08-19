@@ -17,6 +17,8 @@ function EraItem({era,index}:EraItemProps){
     const isEven = index%2===0;
     return(
         <>
+         <div className="bg-[#D86DB5] border-transparent rounded-xl xs:rounded-2xl sm:rounded-3xl p-2 xs:p-3 sm:p-4 md:p-6 lg:p-8 xl:p-10 mb-2 xs:mb-3 sm:mb-4 md:mb-6 mt-2 xs:mt-3 sm:mt-4 md:mt-6">
+                    
             {/*parent of grid div allowing us to position grid correctly*/}
             <div className={`mb-8 sm:mb-12 md:mb-16 lg:mb-20 xl:mb-[100px] mt-8 sm:mt-12 md:mt-16 lg:mt-20 xl:mt-[100px] flex flex-col 2xl:flex-row ${isEven ? "2xl:justify-end" : "2xl:justify-start"} items-center 2xl:items-start`}>
 
@@ -45,6 +47,7 @@ function EraItem({era,index}:EraItemProps){
                      </div>
                     ))}
                 </div>
+            </div>
             </div>
         </>
     )
