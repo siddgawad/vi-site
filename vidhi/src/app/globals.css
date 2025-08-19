@@ -1,2 +1,20 @@
 @import "tailwindcss";
 
+/* background loop */
+:root { --bgY: 0px; }
+.main-bg {
+
+  background-size: 256px auto;
+  background-repeat: repeat;
+  background-position: 0 var(--bgY);
+}
+
+/* reveal primitives */
+.reveal { opacity: 0; transform: translateY(6px); transition: opacity .6s, transform .6s; }
+.reveal.in { opacity: 1; transform: none; }
+
+/* counters polish */
+.counter-done { text-shadow: 0 0 .4em rgba(255,255,255,.35); }
+@media (prefers-reduced-motion: reduce) {
+  .reveal { transition: none !important; transform: none !important; opacity: 1 !important; }
+}

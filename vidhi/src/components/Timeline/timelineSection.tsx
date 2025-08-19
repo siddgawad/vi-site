@@ -3,6 +3,8 @@
 import Image from "next/image"
 import {eras} from "./data/eras"; // stores images
 import type { Era } from "./data/eras";
+import { useInView } from "react-intersection-observer";
+
 
 interface EraItemProps{
     era: Era;
@@ -10,6 +12,8 @@ interface EraItemProps{
 }
 
 function EraItem({era,index}:EraItemProps){
+    const { ref, inView } = useInView({ threshold: 0.15, triggerOnce: true });
+
     const isEven = index%2===0;
     return(
         <>
@@ -22,20 +26,23 @@ function EraItem({era,index}:EraItemProps){
                 </div>
 
                 {/*grid div for positioning - responsive width and grid*/}
-                <div className="w-full sm:w-[90%] md:w-[85%] lg:w-[75%] xl:w-[60%] 2xl:w-[60%] 3xl:w-[75%] my-4 sm:my-6 md:my-8 lg:my-12 xl:my-16 2xl:my-[100px] bg-[#FFCEEF] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6 lg:gap-8 xl:gap-10 2xl:gap-10 3xl:gap-20 p-3 sm:p-4 md:p-6 lg:p-8 xl:p-8 2xl:p-8 3xl:p-8 border-transparent rounded-2xl sm:rounded-3xl">
-                 
+                <div ref={ref} className={`w-fullsm:w-[90%] md:w-[85%] lg:w-[75%] xl:w-[60%] 2xl:w-[60%] 3xl:w-[75%] my-4 sm:my-6 md:my-8 lg:my-12 xl:my-16 2xl:my-[100px] bg-[#FFCEEF] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6 lg:gap-8 xl:gap-10 2xl:gap-10 3xl:gap-20 p-3 sm:p-4 md:p-6 lg:p-8 xl:p-8 2xl:p-8 3xl:p-8 border-transparent rounded-2xl sm:rounded-3xl" reveal ${inView ? 'in' : ''}`}>
+
                     {/*grid elements */}
                     {era.images.map((img, i) => (
-                        <div key={`${era.id}-${i}`} className="relative aspect-square group overflow-hidden rounded-lg sm:rounded-xl">
-                            <Image 
-                                src={`/api/i/${era.base}${img.name}`} 
-                                alt={img.alt} 
-                                fill
-                                sizes="(min-width: 1536px) 400px, (min-width: 1280px) 300px, (min-width: 1024px) 200px, (min-width: 640px) 33vw, (min-width: 480px) 50vw, 100vw"
-                                className="object-cover transition-transform duration-500 group-hover:scale-110"
-                                priority={index < 2} // Load first 2 eras eagerly
-                            />
-                        </div>
+                       <div key={`${era.id}-${i}`} className="group overflow-hidden rounded-lg sm:rounded-xl">
+                       {/* ratio box: reserves height via padding-top */}
+                       <div className="relative w-full pt-[100%]">
+                         <Image
+                           src={`/api/i/${era.base}${img.name}`}
+                           alt={img.alt}
+                           fill
+                           sizes="(min-width: 1536px) 400px, (min-width: 1280px) 300px, (min-width: 1024px) 200px, (min-width: 640px) 33vw, (min-width: 480px) 50vw, 100vw"
+                           className="absolute inset-0 object-cover transition-transform duration-500 group-hover:scale-110"
+                           priority={index < 2}
+                         />
+                       </div>
+                     </div>
                     ))}
                 </div>
             </div>
