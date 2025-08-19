@@ -1,65 +1,129 @@
 "use client"
 
+import { useLayoutEffect, useRef } from "react"
 import Image from "next/image"
-import {eras} from "./data/eras"; // stores images
-import type { Era } from "./data/eras";
-import { useInView } from "react-intersection-observer";
+import gsap from "gsap"
+import { ScrollTrigger } from "gsap/ScrollTrigger"
+import { eras } from "./data/eras"
 
+gsap.registerPlugin(ScrollTrigger)
 
-interface EraItemProps{
-    era: Era;
-    index:number;
-}
+export default function TimelineSection() {
+  const sectionRef = useRef<HTMLDivElement | null>(null)
+  const panelsRef = useRef<HTMLDivElement[]>([])
 
-function EraItem({era,index}:EraItemProps){
-    const { ref, inView } = useInView({ threshold: 0.15, triggerOnce: true });
+  // helper to assign refs inside map
+  const setPanelRef = (el: HTMLDivElement | null, i: number) => {
+    if (el) panelsRef.current[i] = el
+  }
 
-    const isEven = index%2===0;
-    return(
-        <>
-         <div className="bg-[#D86DB5] border-transparent rounded-xl xs:rounded-2xl sm:rounded-3xl p-2 xs:p-3 sm:p-4 md:p-6 lg:p-8 xl:p-10 mb-2 xs:mb-3 sm:mb-4 md:mb-6 mt-2 xs:mt-3 sm:mt-4 md:mt-6">
-                    
-            {/*parent of grid div allowing us to position grid correctly*/}
-            <div className={`mb-8 sm:mb-12 md:mb-16 lg:mb-20 xl:mb-[100px] mt-8 sm:mt-12 md:mt-16 lg:mt-20 xl:mt-[100px] flex flex-col 2xl:flex-row ${isEven ? "2xl:justify-end" : "2xl:justify-start"} items-center 2xl:items-start`}>
+  useLayoutEffect(() => {
+    if (typeof window === "undefined") return
+    if (!sectionRef.current) return
+    if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return
 
-                {/*Title div for each grid - responsive positioning*/}
-                <div className={`text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl 2xl:text-4xl text-white drop-shadow-lg font-bold mb-4 2xl:mb-0 text-center 2xl:text-left 2xl:absolute 2xl:mt-10 ${isEven ? "2xl:right-[540px] 3xl:right-[590px]" : "2xl:left-[540px] 3xl:left-[590px]"}`}>
-                    {era.title}
-                </div>
+    const ctx = gsap.context(() => {
+      const panels = panelsRef.current.filter(Boolean)
+      if (!panels.length) return
 
-                {/*grid div for positioning - responsive width and grid*/}
-                <div ref={ref} className={`w-fullsm:w-[90%] md:w-[85%] lg:w-[75%] xl:w-[60%] 2xl:w-[60%] 3xl:w-[75%] my-4 sm:my-6 md:my-8 lg:my-12 xl:my-16 2xl:my-[100px] bg-[#FFCEEF] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6 lg:gap-8 xl:gap-10 2xl:gap-10 3xl:gap-20 p-3 sm:p-4 md:p-6 lg:p-8 xl:p-8 2xl:p-8 3xl:p-8 border-transparent rounded-2xl sm:rounded-3xl" reveal ${inView ? 'in' : ''}`}>
+      // stack panels on top of each other
+      gsap.set(panels, {
+        position: "absolute",
+        inset: 0,
+        opacity: 0,
+        pointerEvents: "none",
+      })
+      gsap.set(panels[0], { opacity: 1, pointerEvents: "auto" })
 
-                    {/*grid elements */}
-                    {era.images.map((img, i) => (
-                       <div key={`${era.id}-${i}`} className="group overflow-hidden rounded-lg sm:rounded-xl">
-                       {/* ratio box: reserves height via padding-top */}
-                       <div className="relative w-full pt-[100%]">
-                         <Image
-                           src={`/api/i/${era.base}${img.name}`}
-                           alt={img.alt}
-                           fill
-                           sizes="(min-width: 1536px) 400px, (min-width: 1280px) 300px, (min-width: 1024px) 200px, (min-width: 640px) 33vw, (min-width: 480px) 50vw, 100vw"
-                           className="absolute inset-0 object-cover transition-transform duration-500 group-hover:scale-110"
-                           priority={index < 2}
-                         />
-                       </div>
-                     </div>
-                    ))}
-                </div>
+      const steps = panels.length - 1
+      const tl = gsap.timeline({
+        defaults: { ease: "none" },
+        scrollTrigger: {
+          trigger: sectionRef.current!,
+          start: "top top",
+          end: `+=${Math.max(1, steps) * 100}%`, // scroll distance
+          pin: true,
+          scrub: 1,
+          anticipatePin: 1,
+          // nice snapping per panel
+          snap: {
+            snapTo: (value: number) => {
+              const steps = panels.length - 1
+              if (steps <= 0) return 0 // only one panel → snap to start
+              const seg = 1 / steps
+              return Math.round(value / seg) * seg
+            },
+            duration: { min: 0.1, max: 0.3 },
+            ease: "power1.inOut",
+          },
+        },
+      })
+
+      // cross-fade: i => i+1
+      for (let i = 0; i < steps; i++) {
+        tl.to(panels[i], { opacity: 0, duration: 0.5, pointerEvents: "none" })
+          .to(
+            panels[i + 1],
+            { opacity: 1, duration: 0.5, pointerEvents: "auto" },
+            "<"
+          )
+      }
+
+      // refresh on resize (grid heights, etc.)
+      const ro = new ResizeObserver(() => ScrollTrigger.refresh())
+      ro.observe(sectionRef.current!)
+
+      return () => {
+        ro.disconnect()
+        tl.scrollTrigger?.kill()
+        tl.kill()
+      }
+    }, sectionRef)
+
+    return () => ctx.revert()
+  }, [])
+
+  return (
+    <section
+      id="timeline"
+      ref={sectionRef}
+      // outer card wrapper (your theme)
+      className="relative bg-[#D86DB5] rounded-xl xs:rounded-2xl sm:rounded-3xl p-2 xs:p-3 sm:p-4 md:p-6 lg:p-8 xl:p-10 mb-2 xs:mb-3 sm:mb-4 md:mb-6 mt-2 xs:mt-3 sm:mt-4 md:mt-6"
+    >
+      {/* pinned stage */}
+      <div className="relative h-screen rounded-xl xs:rounded-2xl sm:rounded-3xl overflow-hidden">
+        {eras.map((era, index) => (
+          <div key={era.id} ref={(el) => setPanelRef(el, index)} className="absolute inset-0">
+            {/* title */}
+            <div className="absolute top-6 left-1/2 -translate-x-1/2 text-center">
+              <h3 className="text-white drop-shadow-lg font-bold text-xl sm:text-2xl md:text-3xl lg:text-4xl">
+                {era.title}
+              </h3>
             </div>
+  
+            {/* grid box */}
+            <div className="absolute inset-x-0 top-25 sm:top-25 md:top-30 lg:top-35 flex justify-center">
+              <div className="w-full sm:w-[90%] md:w-[85%] bg-[#FFCEEF] grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-3 gap-3 sm:gap-4 p-3 border-transparent rounded-2xl sm:rounded-3xl overflow-y-auto">
+                {era.images.map((img, i) => (
+                  <div key={`${era.id}-${i}`} className="group overflow-hidden rounded-lg sm:rounded-xl">
+                    {/* ratio box so <Image fill /> has height */}
+                    <div className="relative w-full pt-[100%]">
+                      <Image
+                        src={`/api/i/${era.base}${img.name}`}
+                        alt={img.alt}
+                        fill
+                        sizes="(min-width: 640px) 28vw, 90vw"
+                        className="absolute inset-0 object-cover transition-transform duration-500 motion-safe:group-hover:scale-110"
+                        priority={index < 1} // first era eager; others lazy
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
-        </>
-    )
-}
-
-export default function TimelineSection(){
-    return(
-        // main container with responsive padding
-        <div className="border-transparent rounded-2xl sm:rounded-3xl px-2 sm:px-4 md:px-6 lg:px-8">
-            {eras.map((era, index) => (
-                <EraItem key={index} era={era} index={index} />
-            ))}
-        </div>
-    )
+          </div>
+        ))}
+      </div>
+    </section>
+  )
 }
