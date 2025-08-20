@@ -88,32 +88,32 @@ export default function TimelineSection() {
       id="timeline"
       ref={sectionRef}
       // outer card wrapper (your theme)
-      className="relative bg-[#D86DB5] rounded-xl xs:rounded-2xl sm:rounded-3xl p-2 xs:p-3 sm:p-4 md:p-6 lg:p-8 xl:p-10 mb-2 xs:mb-3 sm:mb-4 md:mb-6 mt-2 xs:mt-3 sm:mt-4 md:mt-6"
+      className="relative min-h-auto bg-[#D86DB5] rounded-xl xs:rounded-2xl sm:rounded-3xl p-2 xs:p-3 sm:p-4 md:p-6 lg:p-8 xl:p-10 mb-2 xs:mb-3 sm:mb-4 md:mb-6 mt-2 xs:mt-3 sm:mt-4 md:mt-6"
     >
       {/* pinned stage */}
-      <div className="relative h-screen rounded-xl xs:rounded-2xl sm:rounded-3xl overflow-hidden">
+      <div className="relative  min-h-screen rounded-xl xs:rounded-2xl sm:rounded-3xl overflow-hidden">
         {eras.map((era, index) => (
           <div key={era.id} ref={(el) => setPanelRef(el, index)} className="absolute inset-0">
             {/* title */}
             <div className="absolute top-6 left-1/2 -translate-x-1/2 text-center">
-              <h3 className="text-white drop-shadow-lg font-bold text-xl sm:text-2xl md:text-3xl lg:text-4xl">
+              <h3 className="pt-4 text-white drop-shadow-lg font-bold text-xl sm:text-2xl md:text-3xl lg:text-4xl">
                 {era.title}
               </h3>
             </div>
   
             {/* grid box */}
-            <div className="absolute inset-x-0 top-25 sm:top-25 md:top-30 lg:top-35 flex justify-center">
-              <div className="w-full sm:w-[90%] md:w-[85%] bg-[#FFCEEF] grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-3 gap-3 sm:gap-4 p-3 border-transparent rounded-2xl sm:rounded-3xl overflow-y-auto">
+            <div className="absolute inset-x-0 top-20 bottom-10 sm:top-25 bottom-15 md:top-30 bottom-30 lg:top-35 bottom-30 flex justify-center">
+              <div className=" h-full w-full mt-10 sm:w-[90%] md:w-[90%] lg:w-[90%] bg-[#FFCEEF] grid grid-cols-3 sm:grid-cols-3 lg:grid-cols-3 gap-1 sm:gap-2 p-3 border-transparent rounded-2xl sm:rounded-3xl overflow-y-auto">
                 {era.images.map((img, i) => (
                   <div key={`${era.id}-${i}`} className="group overflow-hidden rounded-lg sm:rounded-xl">
                     {/* ratio box so <Image fill /> has height */}
-                    <div className="relative w-full pt-[100%]">
+                    <div className="relative w-full h-full pt-[100%]">
                       <Image
                         src={`/api/i/${era.base}${img.name}`}
                         alt={img.alt}
                         fill
                         sizes="(min-width: 640px) 28vw, 90vw"
-                        className="absolute inset-0 object-cover transition-transform duration-500 motion-safe:group-hover:scale-110"
+                        className="absolute inset-0 object-contain  transition-transform duration-500 motion-safe:group-hover:scale-110"
                         priority={index < 1} // first era eager; others lazy
                       />
                     </div>

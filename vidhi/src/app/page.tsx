@@ -22,14 +22,12 @@ export default function Page() {
 
 
 
-<Section id="timeline" className="p-2 xs:p-3 sm:p-4 md:p-6 lg:p-8 xl:p-10 bg-[#E18EC5] rounded-xl xs:rounded-2xl sm:rounded-3xl" >
           <TimelineSection />
-        </Section>
+       
 
-
-    
         <LoveCounters />
-
+       
+        
 <JokesSection />
 
 <Section id="map">
