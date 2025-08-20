@@ -18,3 +18,112 @@
 @media (prefers-reduced-motion: reduce) {
   .reveal { transition: none !important; transform: none !important; opacity: 1 !important; }
 }
+
+
+/* 1) Fix for Next/Image "fill" warning
+   Use this on the direct parent of <Image fill />
+   -> replace your "relative aspect-square" with "img-square" (next step)
+*/
+.img-square {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  /* ensures non-zero height before layout kicks in */
+  min-height: clamp(120px, 28vw, 240px);
+  overflow: hidden;
+  border-radius: 0.75rem; /* ~rounded-xl */
+}
+
+/* 2) Sticky era stage scaffolding */
+.era-stage {
+  position: relative;           /* lets us place progress ribbon */
+  display: grid;
+  place-items: center;
+  height: 100vh;                /* the sticky viewport */
+  overflow: visible;
+}
+
+/* 3) 3D carousel shell */
+.carousel-ring {
+  --radius: clamp(140px, 28vw, 360px);
+  width: min(92vw, 720px);
+  height: min(92vw, 720px);
+  margin-inline: auto;
+
+  position: relative;
+  perspective: 1200px;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+/* each card */
+.carousel-cell {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  translate: -50% -50%;
+  width: clamp(110px, 20vw, 220px);
+  height: clamp(110px, 20vw, 220px);
+  border-radius: 14px;
+  overflow: hidden;
+
+  transform-style: preserve-3d;
+  box-shadow: 0 8px 28px rgba(0,0,0,.18);
+  transition: filter .2s ease, box-shadow .2s ease, transform .2s ease;
+}
+
+/* subtle DoF + focus pop (you'll toggle .is-focus in JS) */
+.carousel-cell.is-focus {
+  filter: none !important;
+  box-shadow: 0 12px 40px rgba(0,0,0,.28);
+}
+
+/* 4) Era progress ribbon (pinned at top) */
+.progress-ribbon {
+  position: absolute;
+  inset: 0 0 auto 0;   /* top edge */
+  height: 4px;
+  background: rgba(255,255,255,.15);
+  overflow: hidden;
+  border-radius: 999px;
+}
+.progress-fill {
+  height: 100%;
+  transform-origin: left;
+  transform: scaleX(var(--p, 0));
+  background: linear-gradient(90deg, #FFCEEF, #E18EC5);
+}
+
+/* 5) Exit "deck" state – cards collapse and fade (GSAP will tween opacity/blur) */
+.era--deck .carousel-cell {
+  transform: translate(-50%, -50%) rotate(0deg) scale(.92) !important;
+  box-shadow: 0 20px 60px rgba(0,0,0,.25);
+  /* keep them centered; stacking order will be controlled via z-index in JS */
+}
+
+/* 6) Ambient polish for the ring (slow drift can run without scroll) */
+.carousel-ambient {
+  will-change: transform, filter;
+}
+
+/* 7) Accessibility: reduced motion = no fancy transforms */
+@media (prefers-reduced-motion: reduce) {
+  .carousel-ring,
+  .carousel-cell {
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+    filter: none !important;
+  }
+  .progress-fill { transform: none !important; width: 0; }
+}
+
+/* 8) (Optional) hover/tap nudge */
+@media (hover: hover) {
+  .carousel-cell:hover {
+    transform: translate(-50%, -50%) scale(1.03);
+  }
+}
+
+
+/* Odometer-like digits keep tight line-height */
+.tabular-nums { font-variant-numeric: tabular-nums; }
