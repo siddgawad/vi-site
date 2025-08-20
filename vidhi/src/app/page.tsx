@@ -8,7 +8,8 @@ import LoveCounters from "../components/Counters/LoveCounters"
 import JokesSection from "../components/Jokes/JokesSection"
 import Section from "../components/Layout/Section"
 import { useScrollAnimation } from "../hooks/useScrollAnimation"
-import MapSection from "@/components/Map/MapSection";
+import MusicSection from "@/components/Music/MusicSection";
+// import MapSection from "@/components/Map/MapSection";
 
 export const ScrollCtx = createContext<{ y: number; t: number }>({ y: 0, t: 0 })
 
@@ -35,6 +36,8 @@ export default function Page() {
   <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-center text-white leading-tight sm:leading-normal">
     Music
   </h2>
+  <div><MusicSection />
+  </div>
 </Section>
 
 <Section id="feedback">
@@ -42,8 +45,8 @@ export default function Page() {
     Feedback
   </h2>
 </Section>
-
-{/* <MapSection /> */}
+{/* 
+<MapSection /> */}
 
 </MainContainer>
 </ScrollCtx.Provider>
