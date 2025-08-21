@@ -8,7 +8,8 @@ export type MediaImage = {
   export type Era = {
     id: string;
     title: string;
-    base: string;       
+    base: string; 
+    subtitle?: string;      
     images: MediaImage[];
    
   };
